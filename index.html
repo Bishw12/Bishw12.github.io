@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartPik — Tech that tilts your way</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#0A0D13;
+  --bg-elevated:#0F1420;
+  --card:#151B28;
+  --card-hi:#1B2333;
+  --border:rgba(255,255,255,0.07);
+  --border-hi:rgba(255,255,255,0.14);
+  --text:#F1F3F8;
+  --text-dim:#8B92A8;
+  --text-faint:#565E72;
+  --primary:#6C5CE7;
+  --primary-hi:#8B7CF6;
+  --accent:#2FE6C8;
+  --coral:#FF6B6B;
+  --gold:#FFC857;
+  --radius:18px;
+  --radius-sm:10px;
+  --font-display:'Space Grotesk', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+  --shadow-glow: 0 0 0 1px var(--border), 0 20px 60px -20px rgba(108,92,231,0.35);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(108,92,231,0.18), transparent 60%),
+    radial-gradient(900px 500px at 90% 10%, rgba(47,230,200,0.10), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.5;
+  overflow-x:hidden;
+}
+img,svg{display:block; max-width:100%;}
+a{color:inherit; text-decoration:none;}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+ul{list-style:none;}
+.mono{font-family:var(--font-mono);}
+.wrap{max-width:1240px; margin:0 auto; padding:0 28px;}
+h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; letter-spacing:-0.01em;}
+::selection{background:var(--primary); color:#fff;}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+}
+
+/* ============ SCROLLBAR ============ */
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:#252d3f; border-radius:10px;}
+
+/* ============ HEADER ============ */
+header{
+  position:sticky; top:0; z-index:200;
+  background:rgba(10,13,19,0.78);
+  backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--border);
+}
+.nav{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 28px; max-width:1240px; margin:0 auto;
+  gap:24px;
+}
+.logo{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:20px;}
+.logo-cube{width:30px; height:30px; position:relative; transform-style:preserve-3d; animation:cubespin 9s linear infinite;}
+.logo-cube div{
+  position:absolute; inset:0; border-radius:6px;
+  background:linear-gradient(135deg, var(--primary), var(--accent));
+  opacity:0.9;
+}
+.logo-cube div:nth-child(1){transform:translateZ(9px);}
+.logo-cube div:nth-child(2){transform:rotateY(90deg) translateZ(9px); opacity:0.65;}
+.logo-cube div:nth-child(3){transform:rotateX(90deg) translateZ(9px); opacity:0.4;}
+@keyframes cubespin{ to{ transform:rotateX(360deg) rotateY(360deg);} }
+.logo span{color:var(--text);}
+.logo .dot{color:var(--accent);}
+
+.navlinks{display:flex; gap:30px; font-size:14.5px; color:var(--text-dim);}
+.navlinks a{transition:color .2s;}
+.navlinks a:hover{color:var(--text);}
+
+.nav-actions{display:flex; align-items:center; gap:14px;}
+.search-box{
+  display:flex; align-items:center; gap:8px;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:99px; padding:8px 14px; width:210px;
+  transition:border-color .2s, width .25s;
+}
+.search-box:focus-within{border-color:var(--primary-hi); width:250px;}
+.search-box input{background:none; border:none; color:var(--text); font-size:13.5px; width:100%;}
+.search-box input:focus{outline:none;}
+.search-box svg{flex-shrink:0; opacity:0.6;}
+
+.icon-btn{
+  position:relative; width:40px; height:40px; border-radius:99px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--card); border:1px solid var(--border);
+  transition:transform .2s, border-color .2s;
+}
+.icon-btn:hover{transform:translateY(-2px); border-color:var(--border-hi);}
+.badge{
+  position:absolute; top:-5px; right:-5px; background:var(--coral); color:#fff;
+  font-size:10.5px; font-weight:700; min-width:18px; height:18px; border-radius:99px;
+  display:flex; align-items:center; justify-content:center; padding:0 4px;
+  font-family:var(--font-mono);
+}
+.burger{display:none;}
+
+/* ============ HERO ============ */
+.hero{padding:76px 28px 60px;}
+.hero-grid{
+  max-width:1240px; margin:0 auto;
+  display:grid; grid-template-columns:1.05fr 0.95fr; gap:50px; align-items:center;
+}
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--font-mono); font-size:12px; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--accent); background:rgba(47,230,200,0.09); border:1px solid rgba(47,230,200,0.25);
+  padding:6px 12px; border-radius:99px; margin-bottom:22px;
+}
+.eyebrow::before{content:''; width:6px; height:6px; border-radius:99px; background:var(--accent); box-shadow:0 0 8px var(--accent);}
+.hero h1{font-size:56px; line-height:1.04; letter-spacing:-0.02em;}
+.hero h1 .grad{background:linear-gradient(100deg, var(--primary-hi), var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.hero p{color:var(--text-dim); font-size:17px; max-width:460px; margin:22px 0 32px;}
+.hero-ctas{display:flex; gap:14px; flex-wrap:wrap;}
+
+.btn{
+  padding:14px 26px; border-radius:12px; font-weight:600; font-size:14.5px;
+  display:inline-flex; align-items:center; gap:8px; transition:transform .2s, box-shadow .2s, background .2s;
+}
+.btn-primary{
+  background:linear-gradient(135deg, var(--primary), #5b4bd6); color:#fff;
+  box-shadow:0 10px 30px -8px rgba(108,92,231,0.6);
+}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 14px 34px -6px rgba(108,92,231,0.75);}
+.btn-ghost{background:var(--card); border:1px solid var(--border); color:var(--text);}
+.btn-ghost:hover{border-color:var(--border-hi); transform:translateY(-2px);}
+
+.hero-stats{display:flex; gap:34px; margin-top:44px;}
+.hero-stats div b{display:block; font-family:var(--font-display); font-size:22px;}
+.hero-stats div span{font-size:12.5px; color:var(--text-faint);}
+
+/* --- 3D tilt showcase card (signature element) --- */
+.tilt-stage{perspective:1200px;}
+.tilt-card{
+  position:relative; transform-style:preserve-3d;
+  background:linear-gradient(155deg, var(--card-hi), var(--card));
+  border:1px solid var(--border-hi); border-radius:28px;
+  padding:40px; height:440px;
+  transition:transform .12s ease-out, box-shadow .3s;
+  box-shadow:var(--shadow-glow);
+  display:flex; align-items:center; justify-content:center;
+  will-change:transform;
+}
+.tilt-card::before{
+  content:''; position:absolute; inset:0; border-radius:28px; pointer-events:none;
+  background:radial-gradient(400px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.09), transparent 60%);
+  opacity:var(--glow-op,0); transition:opacity .3s;
+}
+.device{
+  transform-style:preserve-3d; transform:translateZ(40px);
+  width:210px; height:280px; border-radius:34px;
+  background:linear-gradient(160deg, #232b3d, #11141d);
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 30px 60px -15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+  position:relative; display:flex; align-items:center; justify-content:center;
+}
+.device::after{
+  content:''; position:absolute; inset:14px; border-radius:22px;
+  background:linear-gradient(150deg, rgba(108,92,231,0.35), rgba(47,230,200,0.15));
+}
+.device .glyph{position:relative; z-index:2; font-size:52px; transform:translateZ(20px);}
+.float-chip{
+  position:absolute; transform-style:preserve-3d;
+  background:rgba(15,20,32,0.9); border:1px solid var(--border-hi); backdrop-filter:blur(6px);
+  border-radius:12px; padding:10px 14px; font-size:12px; display:flex; align-items:center; gap:8px;
+  box-shadow:0 12px 24px -8px rgba(0,0,0,0.5);
+}
+.float-chip .dot{width:7px; height:7px; border-radius:99px; background:var(--accent); box-shadow:0 0 8px var(--accent);}
+.chip-1{top:26px; left:18px; transform:translateZ(70px);}
+.chip-2{bottom:34px; right:8px; transform:translateZ(60px);}
+.chip-2 .dot{background:var(--gold); box-shadow:0 0 8px var(--gold);}
+.chip-3{bottom:-16px; left:40px; transform:translateZ(85px);}
+.chip-3 .dot{background:var(--primary-hi); box-shadow:0 0 8px var(--primary-hi);}
+
+@media(max-width:960px){
+  .hero-grid{grid-template-columns:1fr;}
+  .tilt-card{margin-top:20px;}
+}
+
+/* ============ SECTION SHELL ============ */
+section{padding:64px 0;}
+.sec-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:34px; gap:20px; flex-wrap:wrap;}
+.sec-head h2{font-size:30px;}
+.sec-head .tag{font-family:var(--font-mono); font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; display:block;}
+.sec-head p{color:var(--text-dim); font-size:14.5px; max-width:420px;}
+
+/* ============ CATEGORIES ============ */
+.cat-rail{
+  display:flex; gap:16px; overflow-x:auto; padding-bottom:8px; scrollbar-width:thin;
+}
+.cat-card{
+  flex:0 0 auto; width:168px; padding:22px 18px; border-radius:16px;
+  background:var(--card); border:1px solid var(--border);
+  cursor:pointer; transition:transform .2s, border-color .2s, background .2s;
+  text-align:left;
+}
+.cat-card:hover{transform:translateY(-4px); border-color:var(--border-hi);}
+.cat-card.active{background:linear-gradient(155deg, rgba(108,92,231,0.22), rgba(47,230,200,0.08)); border-color:var(--primary-hi);}
+.cat-card .ic{font-size:26px; margin-bottom:14px; display:block;}
+.cat-card b{font-size:14.5px; display:block; margin-bottom:3px;}
+.cat-card span{font-size:12px; color:var(--text-faint);}
+
+/* ============ PRODUCTS ============ */
+.filter-row{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px;}
+.pill{
+  padding:9px 16px; border-radius:99px; font-size:13px; background:var(--card);
+  border:1px solid var(--border); color:var(--text-dim); transition:all .2s;
+}
+.pill:hover{color:var(--text); border-color:var(--border-hi);}
+.pill.active{background:var(--primary); color:#fff; border-color:var(--primary);}
+
+.grid-products{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:20px;
+}
+@media(max-width:1080px){.grid-products{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:760px){.grid-products{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.grid-products{grid-template-columns:1fr;}}
+
+.p-card{
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:18px; perspective:800px; position:relative; overflow:hidden;
+  transition:border-color .25s;
+}
+.p-card:hover{border-color:var(--border-hi);}
+.p-tilt{transform-style:preserve-3d; transition:transform .15s ease-out;}
+.p-media{
+  height:150px; border-radius:12px; margin-bottom:16px;
+  display:flex; align-items:center; justify-content:center; font-size:44px;
+  background:var(--card-hi); position:relative; transform:translateZ(20px);
+}
+.p-badge{
+  position:absolute; top:10px; left:10px; font-size:10.5px; font-weight:700;
+  padding:4px 9px; border-radius:99px; font-family:var(--font-mono); letter-spacing:.03em;
+  z-index:2;
+}
+.badge-new{background:var(--accent); color:#04211c;}
+.badge-sale{background:var(--coral); color:#2b0808;}
+.badge-hot{background:var(--gold); color:#332504;}
+.p-fav{
+  position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:99px;
+  background:rgba(10,13,19,0.6); display:flex; align-items:center; justify-content:center; z-index:2;
+  transition:transform .2s;
+}
+.p-fav:hover{transform:scale(1.1);}
+.p-fav.active svg{fill:var(--coral); stroke:var(--coral);}
+.p-cat{font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;}
+.p-name{font-size:15px; font-weight:600; margin-bottom:6px;}
+.p-rating{display:flex; align-items:center; gap:5px; font-size:12px; color:var(--text-faint); margin-bottom:12px;}
+.p-rating .stars{color:var(--gold); letter-spacing:1px;}
+.p-bottom{display:flex; align-items:center; justify-content:space-between;}
+.p-price{font-family:var(--font-mono); font-size:16.5px; font-weight:700;}
+.p-price .old{color:var(--text-faint); text-decoration:line-through; font-size:12.5px; font-weight:400; margin-left:6px;}
+.p-add{
+  width:36px; height:36px; border-radius:10px; background:var(--primary); color:#fff;
+  display:flex; align-items:center; justify-content:center; transition:transform .2s, background .2s;
+}
+.p-add:hover{background:var(--primary-hi); transform:scale(1.08);}
+
+.load-more-wrap{display:flex; justify-content:center; margin-top:34px;}
+
+/* ============ DEAL / COUNTDOWN ============ */
+.deal{
+  background:linear-gradient(120deg, rgba(108,92,231,0.16), rgba(47,230,200,0.08));
+  border:1px solid var(--border-hi); border-radius:24px; padding:44px;
+  display:flex; align-items:center; justify-content:space-between; gap:30px; flex-wrap:wrap;
+}
+.deal h3{font-size:26px; margin-bottom:8px;}
+.deal p{color:var(--text-dim); font-size:14px; max-width:360px;}
+.timer{display:flex; gap:12px;}
+.timer div{
+  background:var(--bg-elevated); border:1px solid var(--border-hi); border-radius:12px;
+  padding:14px 10px; text-align:center; min-width:66px;
+}
+.timer div b{display:block; font-family:var(--font-mono); font-size:24px;}
+.timer div span{font-size:10px; color:var(--text-faint); text-transform:uppercase;}
+
+/* ============ TRUST BAR ============ */
+.trust{display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
+.trust-item{
+  background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px;
+  display:flex; gap:14px; align-items:flex-start;
+}
+.trust-item .ic{font-size:24px;}
+.trust-item b{display:block; font-size:14.5px; margin-bottom:3px;}
+.trust-item span{font-size:12.5px; color:var(--text-faint);}
+@media(max-width:860px){.trust{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.trust{grid-template-columns:1fr;}}
+
+/* ============ REVIEWS ============ */
+.reviews-wrap{position:relative;}
+.reviews-track{display:flex; gap:20px; overflow:hidden;}
+.rev-card{
+  flex:0 0 100%; background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:30px; transition:opacity .3s;
+}
+.rev-top{display:flex; align-items:center; gap:12px; margin-bottom:16px;}
+.avatar{
+  width:44px; height:44px; border-radius:99px; display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-weight:700; font-size:15px; color:#fff;
+  background:linear-gradient(135deg, var(--primary), var(--accent));
+}
+.rev-name{font-weight:600; font-size:14.5px;}
+.rev-role{font-size:12px; color:var(--text-faint);}
+.rev-stars{color:var(--gold); font-size:13px; margin-bottom:10px;}
+.rev-text{color:var(--text-dim); font-size:14.5px; line-height:1.65;}
+.rev-nav{display:flex; justify-content:center; gap:10px; margin-top:24px;}
+.rev-dot{width:8px; height:8px; border-radius:99px; background:var(--border-hi); transition:all .2s;}
+.rev-dot.active{background:var(--primary-hi); width:22px;}
+
+/* ============ FAQ ============ */
+.faq-list{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:12px;}
+.faq-item{background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden;}
+.faq-q{
+  width:100%; padding:20px 22px; display:flex; align-items:center; justify-content:space-between;
+  font-size:15px; font-weight:600; text-align:left;
+}
+.faq-q .plus{transition:transform .25s; color:var(--primary-hi); font-size:20px; flex-shrink:0; margin-left:16px;}
+.faq-item.open .plus{transform:rotate(45deg);}
+.faq-a{max-height:0; overflow:hidden; transition:max-height .3s ease;}
+.faq-a p{padding:0 22px 20px; color:var(--text-dim); font-size:14px; line-height:1.65;}
+
+/* ============ NEWSLETTER ============ */
+.news{
+  background:var(--card); border:1px solid var(--border); border-radius:24px; padding:50px;
+  text-align:center; position:relative; overflow:hidden;
+}
+.news::before{
+  content:''; position:absolute; width:340px; height:340px; border-radius:99px;
+  background:radial-gradient(circle, rgba(108,92,231,0.25), transparent 70%); top:-160px; right:-100px;
+}
+.news h3{font-size:26px; margin-bottom:10px; position:relative;}
+.news p{color:var(--text-dim); font-size:14.5px; margin-bottom:26px; position:relative;}
+.news-form{display:flex; gap:10px; max-width:420px; margin:0 auto; position:relative;}
+.news-form input{
+  flex:1; padding:14px 18px; border-radius:12px; border:1px solid var(--border-hi);
+  background:var(--bg-elevated); color:var(--text); font-size:14px;
+}
+.news-form input:focus{outline:none; border-color:var(--primary-hi);}
+
+/* ============ FOOTER ============ */
+footer{border-top:1px solid var(--border); padding:56px 0 30px; margin-top:40px;}
+.foot-grid{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:40px; margin-bottom:40px;}
+.foot-grid h4{font-size:13.5px; margin-bottom:16px; color:var(--text);}
+.foot-grid ul{display:flex; flex-direction:column; gap:10px;}
+.foot-grid a{color:var(--text-dim); font-size:13.5px; transition:color .2s;}
+.foot-grid a:hover{color:var(--text);}
+.foot-grid p{color:var(--text-faint); font-size:13px; max-width:280px; margin-top:14px;}
+.foot-bottom{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;
+  padding-top:24px; border-top:1px solid var(--border); font-size:12.5px; color:var(--text-faint);
+}
+.socials{display:flex; gap:10px;}
+.socials a{width:34px; height:34px; border-radius:99px; background:var(--card); border:1px solid var(--border); display:flex; align-items:center; justify-content:center;}
+@media(max-width:820px){.foot-grid{grid-template-columns:1fr 1fr;}}
+
+/* ============ CART DRAWER ============ */
+.overlay{
+  position:fixed; inset:0; background:rgba(5,6,10,0.6); backdrop-filter:blur(3px);
+  opacity:0; pointer-events:none; transition:opacity .3s; z-index:300;
+}
+.overlay.show{opacity:1; pointer-events:auto;}
+.drawer{
+  position:fixed; top:0; right:0; height:100%; width:400px; max-width:92vw;
+  background:var(--bg-elevated); border-left:1px solid var(--border-hi); z-index:301;
+  transform:translateX(100%); transition:transform .35s cubic-bezier(.2,.9,.25,1);
+  display:flex; flex-direction:column;
+}
+.drawer.show{transform:translateX(0);}
+.drawer-head{padding:22px 24px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border);}
+.drawer-head h3{font-size:18px;}
+.drawer-close{width:32px; height:32px; border-radius:99px; background:var(--card); display:flex; align-items:center; justify-content:center;}
+.drawer-items{flex:1; overflow-y:auto; padding:18px 24px; display:flex; flex-direction:column; gap:16px;}
+.cart-item{display:flex; gap:12px; align-items:center;}
+.cart-item .ci-media{
+  width:56px; height:56px; border-radius:10px; background:var(--card); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;
+}
+.cart-item .ci-info{flex:1; min-width:0;}
+.cart-item .ci-info b{font-size:13.5px; display:block; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.cart-item .ci-info span{font-size:12px; color:var(--text-faint);}
+.qty-ctrl{display:flex; align-items:center; gap:8px; margin-top:6px;}
+.qty-ctrl button{width:22px; height:22px; border-radius:6px; background:var(--card); border:1px solid var(--border); font-size:13px; display:flex; align-items:center; justify-content:center;}
+.qty-ctrl span{font-family:var(--font-mono); font-size:13px; min-width:16px; text-align:center;}
+.ci-price{font-family:var(--font-mono); font-size:13.5px; font-weight:700; flex-shrink:0;}
+.ci-remove{color:var(--text-faint); font-size:11px; margin-top:4px; text-decoration:underline;}
+.empty-cart{text-align:center; padding:60px 20px; color:var(--text-faint); font-size:14px;}
+.empty-cart .ic{font-size:38px; margin-bottom:14px;}
+.drawer-foot{padding:22px 24px; border-top:1px solid var(--border);}
+.drawer-foot .row{display:flex; justify-content:space-between; font-size:14px; color:var(--text-dim); margin-bottom:8px;}
+.drawer-foot .row.total{font-size:17px; color:var(--text); font-weight:700; font-family:var(--font-mono); margin:14px 0 18px;}
+.drawer-foot .btn{width:100%; justify-content:center;}
+
+/* ============ QUICK VIEW MODAL ============ */
+.modal{
+  position:fixed; inset:0; z-index:310; display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .25s; padding:20px;
+}
+.modal.show{opacity:1; pointer-events:auto;}
+.modal-card{
+  background:var(--bg-elevated); border:1px solid var(--border-hi); border-radius:22px;
+  max-width:680px; width:100%; display:grid; grid-template-columns:1fr 1fr; overflow:hidden;
+  transform:scale(0.94); transition:transform .25s;
+}
+.modal.show .modal-card{transform:scale(1);}
+.modal-media{background:var(--card-hi); display:flex; align-items:center; justify-content:center; font-size:90px; position:relative;}
+.modal-close{position:absolute; top:14px; right:14px; width:34px; height:34px; border-radius:99px; background:rgba(10,13,19,0.6); display:flex; align-items:center; justify-content:center; z-index:2;}
+.modal-info{padding:32px;}
+.modal-info .p-cat{margin-bottom:8px;}
+.modal-info h3{font-size:22px; margin-bottom:10px;}
+.modal-info .desc{color:var(--text-dim); font-size:13.5px; line-height:1.6; margin:14px 0 20px;}
+.modal-price{font-family:var(--font-mono); font-size:24px; font-weight:700; margin-bottom:20px;}
+@media(max-width:600px){.modal-card{grid-template-columns:1fr;} .modal-media{height:180px;}}
+
+/* ============ TOAST ============ */
+.toast{
+  position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(120%);
+  background:var(--card-hi); border:1px solid var(--border-hi); border-radius:12px;
+  padding:14px 22px; display:flex; align-items:center; gap:10px; font-size:13.5px;
+  z-index:400; transition:transform .35s cubic-bezier(.2,.9,.25,1); box-shadow:0 20px 40px -12px rgba(0,0,0,0.5);
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast .ic{color:var(--accent);}
+
+/* ============ MOBILE NAV ============ */
+@media(max-width:900px){
+  .navlinks, .search-box{display:none;}
+  .burger{display:flex; width:40px; height:40px; border-radius:10px; background:var(--card); border:1px solid var(--border); align-items:center; justify-content:center;}
+  .hero h1{font-size:38px;}
+  .mobile-menu{
+    position:fixed; top:0; left:0; right:0; background:var(--bg-elevated); border-bottom:1px solid var(--border-hi);
+    padding:20px 24px; display:flex; flex-direction:column; gap:16px; transform:translateY(-110%); transition:transform .3s; z-index:250;
+  }
+  .mobile-menu.show{transform:translateY(0);}
+  .mobile-menu a{font-size:15px; color:var(--text-dim);}
+}
+@media(min-width:901px){.mobile-menu{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="nav">
+    <div class="logo">
+      <div class="logo-cube"><div></div><div></div><div></div></div>
+      <span>smartpik<span class="dot">.</span></span>
+    </div>
+    <nav class="navlinks">
+      <a href="#categories">Categories</a>
+      <a href="#products">Shop</a>
+      <a href="#deal">Deals</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-actions">
+      <div class="search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="text" placeholder="Search products…" aria-label="Search products">
+      </div>
+      <button class="icon-btn" id="favBtn" aria-label="Wishlist">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+        <span class="badge" id="favCount">0</span>
+      </button>
+      <button class="icon-btn" id="cartBtn" aria-label="Open cart">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+        <span class="badge" id="cartCount">0</span>
+      </button>
+      <button class="burger" id="burgerBtn" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#categories">Categories</a>
+    <a href="#products">Shop</a>
+    <a href="#deal">Deals</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#faq">FAQ</a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <span class="eyebrow">New drop · Spatial Audio Series</span>
+      <h1>Tech that feels <span class="grad">three steps ahead.</span></h1>
+      <p>SmartPik curates the gadgets worth your desk space — audio, wearables, and smart-home gear, picked for build quality and shipped in two days.</p>
+      <div class="hero-ctas">
+        <a href="#products" class="btn btn-primary">
+          Shop the collection
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#categories" class="btn btn-ghost">Browse categories</a>
+      </div>
+      <div class="hero-stats">
+        <div><b id="statProducts">0</b><span>Products live</span></div>
+        <div><b>48hr</b><span>Avg. dispatch</span></div>
+        <div><b>4.8★</b><span>Customer rating</span></div>
+      </div>
+    </div>
+    <div class="tilt-stage">
+      <div class="tilt-card" id="tiltCard">
+        <div class="device"><div class="glyph">🎧</div></div>
+        <div class="float-chip chip-1"><span class="dot"></span> In stock</div>
+        <div class="float-chip chip-2"><span class="dot"></span> 30hr battery</div>
+        <div class="float-chip chip-3"><span class="dot"></span> ANC 2.0</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATEGORIES ============ -->
+<section id="categories">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="tag">Browse</span>
+        <h2>Shop by category</h2>
+      </div>
+      <p>Six curated aisles. Tap one to filter the shop below instantly.</p>
+    </div>
+    <div class="cat-rail" id="catRail"></div>
+  </div>
+</section>
+
+<!-- ============ PRODUCTS ============ -->
+<section id="products">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="tag">Catalog</span>
+        <h2>Featured products</h2>
+      </div>
+      <p>Live inventory — filter, search, and add straight to your cart.</p>
+    </div>
+    <div class="filter-row" id="filterRow"></div>
+    <div class="grid-products" id="productGrid"></div>
+    <div class="load-more-wrap">
+      <button class="btn btn-ghost" id="loadMoreBtn">Load more products</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEAL ============ -->
+<section id="deal">
+  <div class="wrap">
+    <div class="deal">
+      <div>
+        <h3>⚡ Flash deal — 24% off Audio</h3>
+        <p>Ends soon. Discount auto-applies to every headphone and earbud at checkout.</p>
+      </div>
+      <div class="timer" id="timer">
+        <div><b id="tH">00</b><span>Hours</span></div>
+        <div><b id="tM">00</b><span>Mins</span></div>
+        <div><b id="tS">00</b><span>Secs</span></div>
+      </div>
+      <a href="#products" class="btn btn-primary">Grab the deal</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRUST BAR ============ -->
+<section>
+  <div class="wrap">
+    <div class="trust">
+      <div class="trust-item"><span class="ic">🚚</span><div><b>Free shipping</b><span>On orders over $60</span></div></div>
+      <div class="trust-item"><span class="ic">↩️</span><div><b>30-day returns</b><span>No questions asked</span></div></div>
+      <div class="trust-item"><span class="ic">🛡️</span><div><b>2-year warranty</b><span>On every device</span></div></div>
+      <div class="trust-item"><span class="ic">💬</span><div><b>24/7 support</b><span>Real humans, fast replies</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEWS ============ -->
+<section id="reviews">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="tag">Testimonials</span>
+        <h2>What customers say</h2>
+      </div>
+      <p>4.8 out of 5 across 2,300+ verified orders.</p>
+    </div>
+    <div class="reviews-wrap">
+      <div class="reviews-track" id="reviewsTrack"></div>
+      <div class="rev-nav" id="reviewsNav"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head" style="justify-content:center; text-align:center; flex-direction:column; align-items:center;">
+      <span class="tag">Support</span>
+      <h2>Frequently asked questions</h2>
+    </div>
+    <div class="faq-list" id="faqList"></div>
+  </div>
+</section>
+
+<!-- ============ NEWSLETTER ============ -->
+<section>
+  <div class="wrap">
+    <div class="news">
+      <h3>Get first access to new drops</h3>
+      <p>One email a week. Early access, restock alerts, no spam.</p>
+      <form class="news-form" id="newsForm">
+        <input type="email" required placeholder="you@email.com" aria-label="Email address">
+        <button class="btn btn-primary" type="submit">Subscribe</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="logo"><div class="logo-cube"><div></div><div></div><div></div></div><span>smartpik<span class="dot">.</span></span></div>
+        <p>Curated tech for people who care how their desk looks and feels. Based in Bengaluru, shipping worldwide.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul><li><a href="#products">All products</a></li><li><a href="#categories">Categories</a></li><li><a href="#deal">Deals</a></li></ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul><li><a href="#">About</a></li><li><a href="#">Careers</a></li><li><a href="#reviews">Reviews</a></li></ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul><li><a href="#faq">FAQ</a></li><li><a href="#">Shipping</a></li><li><a href="#">Track order</a></li></ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 SmartPik. All rights reserved.</span>
+      <div class="socials">
+        <a href="#" aria-label="Twitter">𝕏</a>
+        <a href="#" aria-label="Instagram">◎</a>
+        <a href="#" aria-label="YouTube">▶</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ CART DRAWER ============ -->
+<div class="overlay" id="overlay"></div>
+<div class="drawer" id="cartDrawer">
+  <div class="drawer-head">
+    <h3>Your cart</h3>
+    <button class="drawer-close" id="drawerClose">✕</button>
+  </div>
+  <div class="drawer-items" id="drawerItems"></div>
+  <div class="drawer-foot" id="drawerFoot">
+    <div class="row"><span>Subtotal</span><span id="cartSubtotal">$0.00</span></div>
+    <div class="row"><span>Shipping</span><span id="cartShipping">Free</span></div>
+    <div class="row total"><span>Total</span><span id="cartTotal">$0.00</span></div>
+    <button class="btn btn-primary" id="checkoutBtn">Checkout securely</button>
+  </div>
+</div>
+
+<!-- ============ QUICK VIEW MODAL ============ -->
+<div class="modal" id="quickModal">
+  <div class="modal-card">
+    <div class="modal-media" id="modalMedia">
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-info" id="modalInfo"></div>
+  </div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast"><span class="ic">✓</span><span id="toastMsg">Added to cart</span></div>
+
+<script>
+/* ======================================================
+   SMARTPIK — DATA LAYER
+====================================================== */
+const CATEGORIES = [
+  {id:'all', name:'All', icon:'✨', count:0},
+  {id:'audio', name:'Audio', icon:'🎧', count:0},
+  {id:'wearables', name:'Wearables', icon:'⌚', count:0},
+  {id:'smart-home', name:'Smart Home', icon:'🏠', count:0},
+  {id:'gaming', name:'Gaming', icon:'🎮', count:0},
+  {id:'accessories', name:'Accessories', icon:'🔌', count:0},
+  {id:'cameras', name:'Cameras', icon:'📷', count:0},
+];
+
+const PRODUCTS = [
+  {id:1, name:'Aura Pro Wireless Earbuds', cat:'audio', price:129, old:159, rating:4.8, reviews:342, glyph:'🎧', badge:'sale', desc:'Active noise cancelling earbuds with 30-hour battery life and adaptive EQ that tunes itself to your ears.'},
+  {id:2, name:'Pulse Over-Ear Headphones', cat:'audio', price:219, old:null, rating:4.9, reviews:210, glyph:'🎧', badge:'new', desc:'Studio-grade over-ear headphones with spatial audio and memory-foam cushions for all-day sessions.'},
+  {id:3, name:'Orbit Smartwatch SE', cat:'wearables', price:189, old:229, rating:4.6, reviews:498, glyph:'⌚', badge:'sale', desc:'Always-on AMOLED smartwatch with 14-day battery, sleep tracking, and 40+ workout modes.'},
+  {id:4, name:'Flux Fitness Band', cat:'wearables', price:59, old:null, rating:4.4, reviews:167, glyph:'⌚', badge:null, desc:'Lightweight fitness band that tracks heart rate, sleep, and stress with a companion app.'},
+  {id:5, name:'Nova Smart Bulb 4-Pack', cat:'smart-home', price:44, old:null, rating:4.5, reviews:389, glyph:'💡', badge:null, desc:'Millions of colors, voice control, and scheduling — set up in under two minutes.'},
+  {id:6, name:'Hearth Smart Thermostat', cat:'smart-home', price:149, old:179, rating:4.7, reviews:256, glyph:'🌡️', badge:'sale', desc:'Learns your schedule and cuts energy bills automatically. Works with all major voice assistants.'},
+  {id:7, name:'Vantage Security Camera', cat:'smart-home', price:89, old:null, rating:4.3, reviews:143, glyph:'📷', badge:'new', desc:'1080p indoor camera with night vision, motion alerts, and two-way audio.'},
+  {id:8, name:'Ranger Pro Controller', cat:'gaming', price:69, old:null, rating:4.8, reviews:512, glyph:'🎮', badge:'hot', desc:'Hall-effect joysticks, back paddles, and 20-hour battery for competitive play.'},
+  {id:9, name:'Quantum Gaming Headset', cat:'gaming', price:99, old:129, rating:4.6, reviews:301, glyph:'🎮', badge:'sale', desc:'7.1 surround sound with a detachable noise-cancelling mic, built for long raid nights.'},
+  {id:10, name:'Grid 65W Fast Charger', cat:'accessories', price:34, old:null, rating:4.7, reviews:620, glyph:'🔌', badge:null, desc:'GaN fast charger that powers a laptop and phone at once — pocket-sized.'},
+  {id:11, name:'Anchor MagSafe Stand', cat:'accessories', price:29, old:null, rating:4.5, reviews:274, glyph:'🔌', badge:'new', desc:'Foldable magnetic stand for phone and earbuds, travels flat in any bag.'},
+  {id:12, name:'Lumen Mirrorless Camera', cat:'cameras', price:649, old:749, rating:4.9, reviews:88, glyph:'📷', badge:'sale', desc:'24MP mirrorless body with in-body stabilization, built for creators on the move.'},
+  {id:13, name:'Streamline Webcam 4K', cat:'cameras', price:79, old:null, rating:4.4, reviews:196, glyph:'📷', badge:null, desc:'4K webcam with auto-framing and a built-in privacy shutter for calls that look sharp.'},
+  {id:14, name:'Echo Mini Speaker', cat:'audio', price:49, old:null, rating:4.3, reviews:410, glyph:'🔊', badge:null, desc:'Pocket speaker with room-filling sound and 12-hour battery, rated IP67.'},
+];
+
+const REVIEWS = [
+  {name:'Ananya R.', role:'Verified buyer · Bengaluru', stars:5, text:"The Aura Pro earbuds are the first pair that actually stay put during runs. Noise cancelling is shockingly good for the price."},
+  {name:'Devon M.', role:'Verified buyer · Austin', stars:5, text:"Ordered the Orbit smartwatch on Monday, wearing it by Wednesday. Battery genuinely lasts the two weeks they promise."},
+  {name:'Priya K.', role:'Verified buyer · Pune', stars:4, text:"Smart bulbs were dead simple to set up and the app doesn't nag you to make an account for everything. Refreshing."},
+  {name:'Liam O.', role:'Verified buyer · Dublin', stars:5, text:"Ranger Pro controller feels better than my console's default pad. The paddles alone are worth the upgrade."},
+  {name:'Sara T.', role:'Verified buyer · Toronto', stars:5, text:"Support answered a shipping question at 11pm and actually solved it. Didn't expect that from an online store."},
+];
+
+const FAQS = [
+  {q:'How long does shipping take?', a:'Most orders dispatch within 48 hours and arrive in 3–5 business days domestically, or 7–12 days internationally. You will get tracking details by email the moment it ships.'},
+  {q:'What is your return policy?', a:'You have 30 days from delivery to return any item in original condition for a full refund. Start a return from your order confirmation email — no restocking fee.'},
+  {q:'Do products come with a warranty?', a:'Every device on SmartPik ships with a 2-year manufacturer warranty covering defects and hardware failure under normal use.'},
+  {q:'Can I change or cancel my order?', a:'Orders can be edited or cancelled free of charge within 1 hour of placing them. After that, reach out to support and we will do our best to catch it before it ships.'},
+  {q:'Do you ship internationally?', a:'Yes — SmartPik ships to over 40 countries. Duties and taxes for your region are calculated and shown at checkout, never as a surprise later.'},
+];
+
+/* ======================================================
+   STATE
+====================================================== */
+let cart = [];       // {id, qty}
+let wishlist = [];   // [id]
+let activeCat = 'all';
+let searchTerm = '';
+let visibleCount = 8;
+let reviewIndex = 0;
+
+/* ======================================================
+   HELPERS
+====================================================== */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+const money = n => '$' + n.toFixed(2);
+const findProduct = id => PRODUCTS.find(p => p.id === id);
+const starString = r => '★'.repeat(Math.round(r)) + '☆'.repeat(5 - Math.round(r));
+
+function badgeLabel(b){
+  if(b === 'sale') return {text:'SALE', cls:'badge-sale'};
+  if(b === 'new') return {text:'NEW', cls:'badge-new'};
+  if(b === 'hot') return {text:'HOT', cls:'badge-hot'};
+  return null;
+}
+
+/* ======================================================
+   RENDER: CATEGORIES
+====================================================== */
+function renderCategories(){
+  CATEGORIES.forEach(c => {
+    c.count = c.id === 'all' ? PRODUCTS.length : PRODUCTS.filter(p => p.cat === c.id).length;
+  });
+  const rail = $('#catRail');
+  rail.innerHTML = CATEGORIES.map(c => `
+    <button class="cat-card ${c.id === activeCat ? 'active' : ''}" data-cat="${c.id}">
+      <span class="ic">${c.icon}</span>
+      <b>${c.name}</b>
+      <span>${c.count} items</span>
+    </button>
+  `).join('');
+  rail.querySelectorAll('.cat-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCat = btn.dataset.cat;
+      visibleCount = 8;
+      renderCategories();
+      renderFilterPills();
+      renderProducts();
+    });
+  });
+}
+
+/* ======================================================
+   RENDER: FILTER PILLS (mirrors categories, compact)
+====================================================== */
+function renderFilterPills(){
+  const row = $('#filterRow');
+  row.innerHTML = CATEGORIES.map(c => `
+    <button class="pill ${c.id === activeCat ? 'active' : ''}" data-cat="${c.id}">${c.name}</button>
+  `).join('');
+  row.querySelectorAll('.pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCat = btn.dataset.cat;
+      visibleCount = 8;
+      renderCategories();
+      renderFilterPills();
+      renderProducts();
+    });
+  });
+}
+
+/* ======================================================
+   RENDER: PRODUCTS
+====================================================== */
+function getFilteredProducts(){
+  return PRODUCTS.filter(p => {
+    const matchCat = activeCat === 'all' || p.cat === activeCat;
+    const matchSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchCat && matchSearch;
+  });
+}
+
+function renderProducts(){
+  const list = getFilteredProducts();
+  const grid = $('#productGrid');
+  const slice = list.slice(0, visibleCount);
+
+  if(slice.length === 0){
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px 0; color:var(--text-faint);">No products match “${searchTerm}”. Try another search or category.</div>`;
+    $('#loadMoreBtn').style.display = 'none';
+    return;
+  }
+
+  grid.innerHTML = slice.map(p => {
+    const b = badgeLabel(p.badge);
+    const isFav = wishlist.includes(p.id);
+    return `
+    <div class="p-card" data-id="${p.id}">
+      <div class="p-tilt">
+        <div class="p-media">
+          ${b ? `<span class="p-badge ${b.cls}">${b.text}</span>` : ''}
+          <button class="p-fav ${isFav ? 'active' : ''}" data-fav="${p.id}" aria-label="Toggle wishlist">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          </button>
+          <span data-view="${p.id}" style="cursor:pointer;">${p.glyph}</span>
+        </div>
+        <div class="p-cat">${p.cat.replace('-', ' ')}</div>
+        <div class="p-name">${p.name}</div>
+        <div class="p-rating"><span class="stars">${starString(p.rating)}</span> ${p.rating} (${p.reviews})</div>
+        <div class="p-bottom">
+          <div class="p-price">${money(p.price)}${p.old ? `<span class="old">${money(p.old)}</span>` : ''}</div>
+          <button class="p-add" data-add="${p.id}" aria-label="Add to cart">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  $('#loadMoreBtn').style.display = list.length > visibleCount ? 'inline-flex' : 'none';
+
+  // bind events
+  grid.querySelectorAll('[data-add]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation();
+    addToCart(parseInt(btn.dataset.add));
+  }));
+  grid.querySelectorAll('[data-fav]').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation();
+    toggleWishlist(parseInt(btn.dataset.fav));
+  }));
+  grid.querySelectorAll('[data-view]').forEach(el => el.addEventListener('click', () => {
+    openQuickView(parseInt(el.dataset.view));
+  }));
+
+  // 3D tilt-on-hover per card
+  grid.querySelectorAll('.p-card').forEach(card => {
+    const inner = card.querySelector('.p-tilt');
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      inner.style.transform = `rotateY(${x * 10}deg) rotateX(${-y * 10}deg) translateZ(4px)`;
+    });
+    card.addEventListener('mouseleave', () => { inner.style.transform = 'rotateY(0) rotateX(0)'; });
+  });
+}
+
+$('#loadMoreBtn').addEventListener('click', () => {
+  visibleCount += 8;
+  renderProducts();
+});
+
+/* ======================================================
+   WISHLIST
+====================================================== */
+function toggleWishlist(id){
+  const i = wishlist.indexOf(id);
+  if(i > -1) wishlist.splice(i, 1); else wishlist.push(id);
+  $('#favCount').textContent = wishlist.length;
+  renderProducts();
+}
+
+/* ======================================================
+   CART
+====================================================== */
+function addToCart(id){
+  const existing = cart.find(c => c.id === id);
+  if(existing) existing.qty++;
+  else cart.push({id, qty:1});
+  renderCart();
+  showToast('Added to cart');
+}
+
+function changeQty(id, delta){
+  const item = cart.find(c => c.id === id);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty <= 0) cart = cart.filter(c => c.id !== id);
+  renderCart();
+}
+
+function removeFromCart(id){
+  cart = cart.filter(c => c.id !== id);
+  renderCart();
+}
+
+function renderCart(){
+  const totalQty = cart.reduce((s, c) => s + c.qty, 0);
+  $('#cartCount').textContent = totalQty;
+
+  const box = $('#drawerItems');
+  if(cart.length === 0){
+    box.innerHTML = `<div class="empty-cart"><div class="ic">🛒</div>Your cart is empty.<br>Add something you'll actually use.</div>`;
+  } else {
+    box.innerHTML = cart.map(c => {
+      const p = findProduct(c.id);
+      return `
+      <div class="cart-item">
+        <div class="ci-media">${p.glyph}</div>
+        <div class="ci-info">
+          <b>${p.name}</b>
+          <span>${money(p.price)} each</span>
+          <div class="qty-ctrl">
+            <button data-dec="${p.id}">−</button>
+            <span>${c.qty}</span>
+            <button data-inc="${p.id}">+</button>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div class="ci-price">${money(p.price * c.qty)}</div>
+          <div class="ci-remove" data-remove="${p.id}">Remove</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    box.querySelectorAll('[data-inc]').forEach(b => b.addEventListener('click', () => changeQty(parseInt(b.dataset.inc), 1)));
+    box.querySelectorAll('[data-dec]').forEach(b => b.addEventListener('click', () => changeQty(parseInt(b.dataset.dec), -1)));
+    box.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => removeFromCart(parseInt(b.dataset.remove))));
+  }
+
+  const subtotal = cart.reduce((s, c) => s + findProduct(c.id).price * c.qty, 0);
+  $('#cartSubtotal').textContent = money(subtotal);
+  $('#cartTotal').textContent = money(subtotal);
+  $('#cartShipping').textContent = subtotal > 60 || subtotal === 0 ? 'Free' : '$6.99';
+  if(subtotal > 0 && subtotal <= 60){
+    $('#cartTotal').textContent = money(subtotal + 6.99);
+  }
+}
+
+$('#checkoutBtn').addEventListener('click', () => {
+  if(cart.length === 0){ showToast("Your cart is empty"); return; }
+  showToast('This is a demo — checkout is not connected 🙂');
+});
+
+/* ======================================================
+   DRAWER OPEN / CLOSE
+====================================================== */
+function openCart(){ $('#cartDrawer').classList.add('show'); $('#overlay').classList.add('show'); }
+function closeCart(){ $('#cartDrawer').classList.remove('show'); $('#overlay').classList.remove('show'); closeModal(); }
+$('#cartBtn').addEventListener('click', openCart);
+$('#drawerClose').addEventListener('click', closeCart);
+$('#overlay').addEventListener('click', () => { closeCart(); closeModal(); });
+
+/* ======================================================
+   QUICK VIEW MODAL
+====================================================== */
+function openQuickView(id){
+  const p = findProduct(id);
+  $('#modalMedia').innerHTML = `<button class="modal-close" id="modalClose2">✕</button>${p.glyph}`;
+  $('#modalInfo').innerHTML = `
+    <div class="p-cat">${p.cat.replace('-', ' ')}</div>
+    <h3>${p.name}</h3>
+    <div class="p-rating"><span class="stars">${starString(p.rating)}</span> ${p.rating} (${p.reviews} reviews)</div>
+    <p class="desc">${p.desc}</p>
+    <div class="modal-price">${money(p.price)}${p.old ? `<span class="old" style="margin-left:10px;">${money(p.old)}</span>` : ''}</div>
+    <button class="btn btn-primary" id="modalAdd" style="width:100%; justify-content:center;">Add to cart</button>
+  `;
+  $('#modalAdd').addEventListener('click', () => { addToCart(p.id); closeModal(); openCart(); });
+  $('#modalClose2').addEventListener('click', closeModal);
+  $('#quickModal').classList.add('show');
+  $('#overlay').classList.add('show');
+}
+function closeModal(){ $('#quickModal').classList.remove('show'); }
+$('#modalClose').addEventListener('click', closeModal);
+
+/* ======================================================
+   TOAST
+====================================================== */
+let toastTimer;
+function showToast(msg){
+  $('#toastMsg').textContent = msg;
+  $('#toast').classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => $('#toast').classList.remove('show'), 2200);
+}
+
+/* ======================================================
+   SEARCH
+====================================================== */
+$('#searchInput').addEventListener('input', e => {
+  searchTerm = e.target.value;
+  visibleCount = 8;
+  renderProducts();
+});
+
+/* ======================================================
+   MOBILE MENU
+====================================================== */
+$('#burgerBtn').addEventListener('click', () => $('#mobileMenu').classList.toggle('show'));
+$$('.mobile-menu a').forEach(a => a.addEventListener('click', () => $('#mobileMenu').classList.remove('show')));
+
+/* ======================================================
+   HERO 3D TILT
+====================================================== */
+const tiltCard = $('#tiltCard');
+tiltCard.addEventListener('mousemove', e => {
+  const r = tiltCard.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width;
+  const y = (e.clientY - r.top) / r.height;
+  const rx = (0.5 - y) * 16;
+  const ry = (x - 0.5) * 16;
+  tiltCard.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+  tiltCard.style.setProperty('--mx', `${x * 100}%`);
+  tiltCard.style.setProperty('--my', `${y * 100}%`);
+  tiltCard.style.setProperty('--glow-op', 1);
+});
+tiltCard.addEventListener('mouseleave', () => {
+  tiltCard.style.transform = 'rotateX(0) rotateY(0)';
+  tiltCard.style.setProperty('--glow-op', 0);
+});
+
+/* ======================================================
+   REVIEWS CAROUSEL
+====================================================== */
+function renderReviews(){
+  $('#reviewsTrack').innerHTML = REVIEWS.map(r => `
+    <div class="rev-card">
+      <div class="rev-top">
+        <div class="avatar">${r.name.split(' ').map(w => w[0]).join('')}</div>
+        <div>
+          <div class="rev-name">${r.name}</div>
+          <div class="rev-role">${r.role}</div>
+        </div>
+      </div>
+      <div class="rev-stars">${starString(r.stars)}</div>
+      <div class="rev-text">"${r.text}"</div>
+    </div>
+  `).join('');
+  $('#reviewsNav').innerHTML = REVIEWS.map((_, i) => `<div class="rev-dot ${i === 0 ? 'active' : ''}" data-i="${i}"></div>`).join('');
+  $('#reviewsNav').querySelectorAll('.rev-dot').forEach(dot => dot.addEventListener('click', () => {
+    reviewIndex = parseInt(dot.dataset.i);
+    updateReviewPosition();
+  }));
+}
+
+function updateReviewPosition(){
+  $('#reviewsTrack').style.transform = `translateX(-${reviewIndex * 100}%)`;
+  $$('.rev-dot').forEach((d, i) => d.classList.toggle('active', i === reviewIndex));
+}
+
+setInterval(() => {
+  reviewIndex = (reviewIndex + 1) % REVIEWS.length;
+  updateReviewPosition();
+}, 5000);
+
+/* ======================================================
+   FAQ ACCORDION
+====================================================== */
+function renderFaqs(){
+  $('#faqList').innerHTML = FAQS.map((f, i) => `
+    <div class="faq-item" data-i="${i}">
+      <button class="faq-q">${f.q}<span class="plus">+</span></button>
+      <div class="faq-a"><p>${f.a}</p></div>
+    </div>
+  `).join('');
+  $$('.faq-item').forEach(item => {
+    const q = item.querySelector('.faq-q');
+    const a = item.querySelector('.faq-a');
+    q.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      $$('.faq-item').forEach(other => {
+        other.classList.remove('open');
+        other.querySelector('.faq-a').style.maxHeight = null;
+      });
+      if(!isOpen){
+        item.classList.add('open');
+        a.style.maxHeight = a.scrollHeight + 'px';
+      }
+    });
+  });
+}
+
+/* ======================================================
+   COUNTDOWN TIMER (resets every 6 hours from page load)
+====================================================== */
+let dealEnd = Date.now() + (1000 * 60 * 60 * 6);
+function tickTimer(){
+  let diff = dealEnd - Date.now();
+  if(diff <= 0){ dealEnd = Date.now() + (1000 * 60 * 60 * 6); diff = dealEnd - Date.now(); }
+  const h = Math.floor(diff / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  $('#tH').textContent = String(h).padStart(2, '0');
+  $('#tM').textContent = String(m).padStart(2, '0');
+  $('#tS').textContent = String(s).padStart(2, '0');
+}
+setInterval(tickTimer, 1000);
+
+/* ======================================================
+   NEWSLETTER
+====================================================== */
+$('#newsForm').addEventListener('submit', e => {
+  e.preventDefault();
+  showToast("You're on the list 🎉");
+  e.target.reset();
+});
+
+/* ======================================================
+   HEADER SHADOW / SCROLL POLISH
+====================================================== */
+window.addEventListener('scroll', () => {
+  document.querySelector('header').style.boxShadow = window.scrollY > 10 ? '0 10px 30px -20px rgba(0,0,0,0.6)' : 'none';
+});
+
+/* ======================================================
+   INIT
+====================================================== */
+function init(){
+  renderCategories();
+  renderFilterPills();
+  renderProducts();
+  renderCart();
+  renderReviews();
+  renderFaqs();
+  tickTimer();
+  $('#statProducts').textContent = PRODUCTS.length + '+';
+}
+init();
+</script>
+</body>
+</html>
