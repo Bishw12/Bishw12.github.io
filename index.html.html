@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaCart — Modern Store</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="header">
+  <a class="logo" href="#"><span>✦</span> NovaCart</a>
+  <div class="search"><input id="searchInput" type="search" placeholder="Search products..."><button id="searchBtn">⌕</button></div>
+  <nav><a href="#products">Shop</a><a href="#categories">Categories</a><button class="cart-btn" id="cartBtn">🛒 <span>Cart</span> <b id="cartCount">0</b></button></nav>
+</header>
+
+<main>
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">NEW SEASON • 2026</p>
+    <h1>Style that moves<br><em>with you.</em></h1>
+    <p class="hero-text">Discover curated essentials for everyday life — designed beautifully, priced fairly.</p>
+    <a href="#products" class="primary">Shop now <span>→</span></a>
+    <div class="trust"><span>✓ Free shipping over ₹999</span><span>✓ Easy 7-day returns</span></div>
+  </div>
+  <div class="hero-art"><div class="orb"></div><div class="product-card"><div class="shoe">👟</div><strong>Urban Runner</strong><small>₹2,499</small></div></div>
+</section>
+
+<section class="section" id="categories">
+  <div class="section-head"><div><p class="eyebrow">EXPLORE</p><h2>Shop by category</h2></div></div>
+  <div class="categories">
+    <button data-cat="All">✦<strong>All</strong><small>Everything</small></button>
+    <button data-cat="Fashion">◈<strong>Fashion</strong><small>Modern looks</small></button>
+    <button data-cat="Tech">⌁<strong>Tech</strong><small>Smart essentials</small></button>
+    <button data-cat="Home">⌂<strong>Home</strong><small>Daily comfort</small></button>
+    <button data-cat="Beauty">✿<strong>Beauty</strong><small>Self care</small></button>
+  </div>
+</section>
+
+<section class="section" id="products">
+  <div class="section-head">
+    <div><p class="eyebrow">CURATED FOR YOU</p><h2>Trending products</h2></div>
+    <select id="sort"><option value="featured">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="rating">Top Rated</option></select>
+  </div>
+  <div id="productGrid" class="grid"></div>
+</section>
+
+<section class="newsletter">
+  <div><p class="eyebrow">STAY IN THE LOOP</p><h2>Get 10% off your first order.</h2><p>Join our newsletter for new drops and special offers.</p></div>
+  <form id="newsletterForm"><input type="email" required placeholder="Your email address"><button class="primary">Subscribe</button></form>
+</section>
+</main>
+
+<footer><div class="logo"><span>✦</span> NovaCart</div><p>Modern essentials. Better everyday.</p><div>© 2026 NovaCart</div></footer>
+
+<div class="overlay" id="overlay"></div>
+<aside class="cart" id="cart">
+  <div class="cart-head"><h2>Your cart</h2><button id="closeCart">×</button></div>
+  <div id="cartItems" class="cart-items"></div>
+  <div class="cart-foot"><div><span>Subtotal</span><strong id="subtotal">₹0</strong></div><small>Shipping and taxes calculated at checkout.</small><button class="primary full" id="checkoutBtn">Checkout →</button></div>
+</aside>
+
+<div class="modal" id="modal">
+  <div class="modal-box"><button class="modal-close" id="closeModal">×</button><div id="modalContent"></div></div>
+</div>
+<script src="js/script.js"></script>
+</body>
+</html>
